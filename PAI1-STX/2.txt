@@ -1,0 +1,16 @@
+POST / HTTP/1.1
+Accept-Encoding:  identity
+Content-Type:  application/x-www-form-urlencoded
+Content-Length:  70
+Host:  127.0.0.1:8080
+User-Agent:  Python-urllib/3.14
+X-Signature:  4032b48f126e23a533cd88c521818588b4500c692fd42e05953e18829f6ca6ff
+X-Nonce:  14b9aec0-7e77-464b-b605-ef190f1c99fc
+X-Timestamp:  1790611452
+Connection:  close
+
+{"tx_id": "3baccf99-388e-45a6-a1b2-e3ac5ea74e3c", "amount": 500050.75}
+
+HTTP/1.0 200 OK
+Server: BaseHTTP/0.6 Python/3.14.7
+Date:12 GMT
