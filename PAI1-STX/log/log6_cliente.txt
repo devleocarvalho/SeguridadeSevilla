@@ -1,0 +1,29 @@
+Comandos disponibles: signin | login | transfer | logout | exit
+login
+Usuario:
+AlejandroSanz
+Contraseña:
+[OMITIDA]
+Respuesta Login: Inicio de sesión exitoso.
+Cookies guardadas localmente:
+- session_id: [OMITIDO]
+transfer
+Cuenta de Origen:
+cuentaA
+Cuenta de Destio:
+cuentaBB
+Cantidad:
+1000
+Moneda:
+EUR
+Respuesta Transferencia: Transacción exitosa.
+transfer
+Cuenta de Origen:
+cuentaA
+Cuenta de Destio:
+cuentaBB
+Cantidad:
+1000
+Moneda:
+EUR
+Error en transferencia (403): Mensaje no seguro detectado.

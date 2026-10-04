@@ -1,0 +1,6 @@
+
+Intento 1: HTTP 401 - Credenciales incorrectas.
+Intento 2: HTTP 401 - Credenciales incorrectas.
+Intento 3: HTTP 401 - Credenciales incorrectas.
+Probando a seguir con la contraseña correcta...
+Defensa activa: cuenta bloqueada - HTTP 429: Cuenta bloqueada temporalmente.

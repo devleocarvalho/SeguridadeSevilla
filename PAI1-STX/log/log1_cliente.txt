@@ -1,0 +1,31 @@
+Comandos disponiveis: signin | login | transfer | logout | exit
+signin
+Nuevo Usuario:
+admin
+Contraseña:
+[OMITIDA]
+Error en login (403): Usuario ya existe.
+signin
+Nuevo Usuario:
+AlejandroSanz
+Contraseña:
+[OMITIDA]
+Respuesta Sign In: Registro exitoso.
+login
+Usuario:
+AlejandroSanz
+Contraseña:
+[OMITIDA]
+Respuesta Login: Inicio de sesión exitoso.
+Cookies guardadas localmente:
+- session_id: [OMITIDO]
+transfer
+Cuenta de Origen:
+cuentaA
+Cuenta de Destio:
+cuentaB
+Cantidad:
+10
+Moneda:
+EUR
+Respuesta Transferencia: Transacción exitosa.

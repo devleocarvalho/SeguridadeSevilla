@@ -1,0 +1,13 @@
+Execucao visivel 1:
+Peticiones por caso: 10
+Error al inicio de la firma: mediana 0.694 ms
+Error al final de la firma: mediana 0.704 ms
+Execucao visivel 2:
+Peticiones por caso: 10
+Error al inicio de la firma: mediana 1.011 ms
+Error al final de la firma: mediana 0.915 ms
+
+Advertencia visivel:
+La red y el sistema operativo afectan los tiempos. Esta medición no demuestra
+que se haya descubierto un secreto; solo permite observar la respuesta del
+servidor.

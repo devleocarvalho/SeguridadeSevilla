@@ -1,0 +1,9 @@
+Metodo  URL        Status HTTP
+POST    /signin    403
+POST    /signin    200
+POST    /transfer  403
+POST    /signin    200
+POST    /signin    200
+POST    /login     200
+POST    /transfer  200
+POST    /logout    200
