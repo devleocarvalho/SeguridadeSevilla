@@ -1,0 +1,11 @@
+Normas del entregable
+Cada grupo debe entregar a través de la Plataforma de Enseñanza Virtual y en la actividad preparada para ello un archivo zip, nombrado PAI2-STX.zip, que deberá contener al menos los ficheros siguientes:
+- Código fuente de las posibles implementaciones y/o scripts desarrollados y/o configuraciones, será necesario la entrega de los test, logs de las pruebas y trazas de los sniffers utilizados.
+- Documento PDF (máximo 15 páginas), estructura del documento:
+- Resumen: indicar brevemente las decisiones técnicas y algorítmicas implementadas para satisfacer los requisitos funcionales y de seguridad.
+- Manual de despliegue y uso: instrucciones de instalación y puesta en funcionamiento del proyecto, y se explique y detalle las funcionalidades principales del proyecto.
+- Grado de completitud: indicar de manera trazable el grado de cumplimiento de los objetivos, requisitos funcionales y de seguridad frente al código entregado.
+
+El plazo de entrega de dicho proyecto finaliza el día 27 de octubre a las 23:59 horas.
+Los proyectos entregados fuera del plazo establecidos serán considerados inadecuados por el cliente y por tanto entrarán en penalización por cada día de retraso entrega de 10% del total, hasta agotarse los puntos.
+El cliente no aceptará envíos realizados por email, ni mensajes internos de la enseñanza virtual, ni correo interno de la enseñanza virtual. Toda entrega realizada por estos medios conllevará una penalización en la entrega del 10%.
