@@ -14,7 +14,7 @@ Avda. Reina Mercedes s/n. 41012 Sevilla | Tel: +34 954 557 139 | Web: [www.lsi.u
 | **Fecha de Emisión** | 6 de octubre de 2026 |
 | **Fecha Límite Oficial** | 27 de octubre de 2026 (23:59 h) |
 | **Equipo Auditor** | **Security Team 3 (Grupo 3)** |
-| **Analistas de Seguridad** | Kleber Leonardo de Carvalho<br>Paula Benítez<br>Luigui Juan Guillermo Ramos |
+| **Analistas de Seguridad** | Kleber Leonardo de Carvalho<br>Paula Benítez<br>Luigui Juan<br>Guillermo Ramos |
 | **Destinatario** | Dirección de Tecnologías de la Información y las Comunicaciones (Área de Seguridad y CISO) — **Universidad Pública U-Secure** |
 | **Clasificación del Documento** | **CONFIDENCIAL / USO INTERNO (RESTRICTED TLP:AMBER+)** |
 | **Identificador del Entregable**| `PAI2-ST3.zip` |
@@ -617,7 +617,7 @@ La auditoría técnica, las pruebas de penetración y los ensayos de rendimiento
 
 **Emitido y firmado por:**  
 *Equipo Security Team 3 — Grupo 3*  
-Analistas: Kleber Leonardo de Carvalho, Paula Benítez, Luigui Juan Guillermo Ramos.  
+Analistas: Kleber Leonardo de Carvalho, Paula Benítez, Luigui Juan, Guillermo Ramos.  
 *E.T.S. Ingeniería Informática — Universidad de Sevilla*
 
 ---
