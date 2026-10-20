@@ -1,0 +1,74 @@
+<?xml version="1.0" ?>
+<mxfile host="app.diagrams.net" agent="U-Secure Audit Tool" version="21.0.0">
+  <diagram id="topologia_byodsec" name="Topologia de Red BYODSEC">
+    <mxGraphModel dx="1400" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+        <mxCell id="sec_externa" value="Zona No Confiable (Internet / Redes Públicas)" style="swimlane;whiteSpace=wrap;html=1;fillColor=#f8fafc;strokeColor=#94a3b8;fontStyle=1;fontSize=12;fontColor=#334155;" parent="1" vertex="1"/>
+        <mxGeometry x="40" y="40" width="280" height="520" as_="geometry"/>
+        <mxCell id="d1" value="&amp;lt;b&amp;gt;Dispositivo BYOD (PDI)&amp;lt;/b&amp;gt;&amp;lt;br&amp;gt;carmen_pdi&amp;lt;br&amp;gt;Cert X.509 + Clave Privada" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e0f2fe;strokeColor=#0284c7;fontColor=#0369a1;fontSize=11;" parent="1" vertex="1"/>
+        <mxGeometry x="60" y="90" width="240" height="70" as_="geometry"/>
+        <mxCell id="d2" value="&amp;lt;b&amp;gt;Dispositivo BYOD (PTGAS)&amp;lt;/b&amp;gt;&amp;lt;br&amp;gt;manuel_ptgas&amp;lt;br&amp;gt;Cert X.509 + Clave Privada" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e0f2fe;strokeColor=#0284c7;fontColor=#0369a1;fontSize=11;" parent="1" vertex="1"/>
+        <mxGeometry x="60" y="190" width="240" height="70" as_="geometry"/>
+        <mxCell id="d3" value="&amp;lt;b&amp;gt;Dispositivo BYOD (Investigador)&amp;lt;/b&amp;gt;&amp;lt;br&amp;gt;lucia_inv&amp;lt;br&amp;gt;Cert X.509 + Clave Privada" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e0f2fe;strokeColor=#0284c7;fontColor=#0369a1;fontSize=11;" parent="1" vertex="1"/>
+        <mxGeometry x="60" y="290" width="240" height="70" as_="geometry"/>
+        <mxCell id="atk" value="&amp;lt;b&amp;gt;Atacante Externo&amp;lt;/b&amp;gt;&amp;lt;br&amp;gt;(Sin Certificado / Rogue PKI)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fee2e2;strokeColor=#ef4444;fontColor=#991b1b;fontSize=11;" parent="1" vertex="1"/>
+        <mxGeometry x="60" y="420" width="240" height="70" as_="geometry"/>
+        <mxCell id="sec_perimetro" value="Perímetro Corporativo U-Secure" style="swimlane;whiteSpace=wrap;html=1;fillColor=#f8fafc;strokeColor=#0284c7;fontStyle=1;fontSize=12;fontColor=#0369a1;" parent="1" vertex="1"/>
+        <mxGeometry x="380" y="40" width="320" height="520" as_="geometry"/>
+        <mxCell id="fw" value="&amp;lt;b&amp;gt;Firewall Perimetral&amp;lt;/b&amp;gt;&amp;lt;br&amp;gt;Puerto TCP 8443" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fef3c7;strokeColor=#f59e0b;fontColor=#92400e;fontSize=11;" parent="1" vertex="1"/>
+        <mxGeometry x="420" y="90" width="240" height="60" as_="geometry"/>
+        <mxCell id="vpn" value="&amp;lt;b&amp;gt;Pasarela VPN Road Warrior&amp;lt;/b&amp;gt;&amp;lt;br&amp;gt;TLS 1.3 Estricto + mTLS Obligatorio&amp;lt;br&amp;gt;vpn.usecure.edu.es" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dbeafe;strokeColor=#2563eb;fontColor=#1e40af;fontSize=11;" parent="1" vertex="1"/>
+        <mxGeometry x="410" y="200" width="260" height="75" as_="geometry"/>
+        <mxCell id="pki" value="&amp;lt;b&amp;gt;U-Secure Root CA v1.3&amp;lt;/b&amp;gt;&amp;lt;br&amp;gt;Almacén de Certificados X.509" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f0fdf4;strokeColor=#16a34a;fontColor=#166534;fontSize=11;" parent="1" vertex="1"/>
+        <mxGeometry x="420" y="320" width="240" height="60" as_="geometry"/>
+        <mxCell id="db" value="&amp;lt;b&amp;gt;Directorio Corporativo SQLite&amp;lt;/b&amp;gt;&amp;lt;br&amp;gt;PBKDF2-SHA256 (600k iter)&amp;lt;br&amp;gt;Sesiones Activas &amp;amp; Auditoría" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#f1f5f9;strokeColor=#64748b;fontColor=#1e293b;fontSize=11;" parent="1" vertex="1"/>
+        <mxGeometry x="420" y="410" width="240" height="80" as_="geometry"/>
+        <mxCell id="sec_intranet" value="Intranet y Recursos Internos (Pool 10.8.0.0/22)" style="swimlane;whiteSpace=wrap;html=1;fillColor=#f8fafc;strokeColor=#16a34a;fontStyle=1;fontSize=12;fontColor=#166534;" parent="1" vertex="1"/>
+        <mxGeometry x="760" y="40" width="300" height="520" as_="geometry"/>
+        <mxCell id="srv1" value="&amp;lt;b&amp;gt;Buzón Webmail Institucional&amp;lt;/b&amp;gt;&amp;lt;br&amp;gt;Acceso RBAC Todos los Perfiles" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f0fdf4;strokeColor=#22c55e;fontColor=#15803d;fontSize=11;" parent="1" vertex="1"/>
+        <mxGeometry x="790" y="90" width="240" height="60" as_="geometry"/>
+        <mxCell id="srv2" value="&amp;lt;b&amp;gt;Campus Virtual y Calificaciones&amp;lt;/b&amp;gt;&amp;lt;br&amp;gt;Acceso PDI y Alumnos" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f0fdf4;strokeColor=#22c55e;fontColor=#15803d;fontSize=11;" parent="1" vertex="1"/>
+        <mxGeometry x="790" y="190" width="240" height="60" as_="geometry"/>
+        <mxCell id="srv3" value="&amp;lt;b&amp;gt;Gestión Admin. y Nóminas&amp;lt;/b&amp;gt;&amp;lt;br&amp;gt;Acceso Exclusivo PTGAS" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f0fdf4;strokeColor=#22c55e;fontColor=#15803d;fontSize=11;" parent="1" vertex="1"/>
+        <mxGeometry x="790" y="290" width="240" height="60" as_="geometry"/>
+        <mxCell id="srv4" value="&amp;lt;b&amp;gt;Clúster HPC y Repositorio I+D&amp;lt;/b&amp;gt;&amp;lt;br&amp;gt;Acceso Exclusivo Investigadores" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f0fdf4;strokeColor=#22c55e;fontColor=#15803d;fontSize=11;" parent="1" vertex="1"/>
+        <mxGeometry x="790" y="390" width="240" height="60" as_="geometry"/>
+        <mxCell id="e1" value="Túnel TLS 1.3 mTLS" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#0284c7;strokeWidth=2;fontColor=#0284c7;fontSize=10;" parent="1" source="d1" target="fw" edge="1">
+          <mxGeometry relative="1" as_="geometry"/>
+        </mxCell>
+        <mxCell id="e2" value="Túnel TLS 1.3 mTLS" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#0284c7;strokeWidth=2;fontColor=#0284c7;fontSize=10;" parent="1" source="d2" target="fw" edge="1">
+          <mxGeometry relative="1" as_="geometry"/>
+        </mxCell>
+        <mxCell id="e3" value="Túnel TLS 1.3 mTLS" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#0284c7;strokeWidth=2;fontColor=#0284c7;fontSize=10;" parent="1" source="d3" target="fw" edge="1">
+          <mxGeometry relative="1" as_="geometry"/>
+        </mxCell>
+        <mxCell id="e_atk" value="Fatal Alert: Bloqueado" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#ef4444;strokeWidth=2;fontColor=#ef4444;fontSize=10;dashed=1;" parent="1" source="atk" target="fw" edge="1">
+          <mxGeometry relative="1" as_="geometry"/>
+        </mxCell>
+        <mxCell id="e_fw_vpn" value="TCP 8443" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#0284c7;strokeWidth=2;fontColor=#0284c7;fontSize=10;" parent="1" source="fw" target="vpn" edge="1">
+          <mxGeometry relative="1" as_="geometry"/>
+        </mxCell>
+        <mxCell id="e_vpn_pki" value="Valida Cadena X.509" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#16a34a;strokeWidth=2;fontColor=#16a34a;fontSize=10;" parent="1" source="vpn" target="pki" edge="1">
+          <mxGeometry relative="1" as_="geometry"/>
+        </mxCell>
+        <mxCell id="e_vpn_db" value="PBKDF2 &amp; Sesión" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#64748b;strokeWidth=2;fontColor=#64748b;fontSize=10;" parent="1" source="vpn" target="db" edge="1">
+          <mxGeometry relative="1" as_="geometry"/>
+        </mxCell>
+        <mxCell id="e_v1" value="IP Virtual 10.8.0.x" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#16a34a;strokeWidth=2;fontColor=#16a34a;fontSize=10;" parent="1" source="vpn" target="srv1" edge="1">
+          <mxGeometry relative="1" as_="geometry"/>
+        </mxCell>
+        <mxCell id="e_v2" value="IP Virtual 10.8.0.x" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#16a34a;strokeWidth=2;fontColor=#16a34a;fontSize=10;" parent="1" source="vpn" target="srv2" edge="1">
+          <mxGeometry relative="1" as_="geometry"/>
+        </mxCell>
+        <mxCell id="e_v3" value="IP Virtual 10.8.0.x" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#16a34a;strokeWidth=2;fontColor=#16a34a;fontSize=10;" parent="1" source="vpn" target="srv3" edge="1">
+          <mxGeometry relative="1" as_="geometry"/>
+        </mxCell>
+        <mxCell id="e_v4" value="IP Virtual 10.8.0.x" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#16a34a;strokeWidth=2;fontColor=#16a34a;fontSize=10;" parent="1" source="vpn" target="srv4" edge="1">
+          <mxGeometry relative="1" as_="geometry"/>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

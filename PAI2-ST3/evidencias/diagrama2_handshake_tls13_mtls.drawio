@@ -1,0 +1,55 @@
+<?xml version="1.0" ?>
+<mxfile host="app.diagrams.net" agent="U-Secure Audit Tool" version="21.0.0">
+  <diagram id="handshake_tls13" name="Handshake TLS 1.3 con mTLS">
+    <mxGraphModel dx="1400" dy="1100" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+        <mxCell id="c_box" value="&amp;lt;b&amp;gt;Dispositivo BYOD (Cliente)&amp;lt;/b&amp;gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e0f2fe;strokeColor=#0284c7;fontColor=#0369a1;fontSize=12;" parent="1" vertex="1"/>
+        <mxGeometry x="80" y="40" width="200" height="50" as_="geometry"/>
+        <mxCell id="s_box" value="&amp;lt;b&amp;gt;Pasarela VPN (Puerto 8443)&amp;lt;/b&amp;gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dbeafe;strokeColor=#2563eb;fontColor=#1e40af;fontSize=12;" parent="1" vertex="1"/>
+        <mxGeometry x="450" y="40" width="220" height="50" as_="geometry"/>
+        <mxCell id="db_box" value="&amp;lt;b&amp;gt;Directorio Corporativo SQLite&amp;lt;/b&amp;gt;" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#f1f5f9;strokeColor=#64748b;fontColor=#1e293b;fontSize=12;" parent="1" vertex="1"/>
+        <mxGeometry x="800" y="30" width="200" height="60" as_="geometry"/>
+        <mxCell id="ph_0" value="&amp;lt;b&amp;gt;FASE 1: HANDSHAKE TLS 1.3 CON AUTENTICACIÓN MUTUA (mTLS)&amp;lt;/b&amp;gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#eff6ff;strokeColor=#3b82f6;fontColor=#1e293b;fontSize=11;align=center;" parent="1" vertex="1"/>
+        <mxGeometry x="60" y="110" width="960" height="25" as_="geometry"/>
+        <mxCell id="msg_1" value="1. TCP SYN / SYN-ACK / ACK" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#cbd5e1;fontColor=#334155;fontSize=10;align=left;spacingLeft=10;" parent="1" vertex="1"/>
+        <mxGeometry x="80" y="140" width="920" height="22" as_="geometry"/>
+        <mxCell id="msg_2" value="2. TLS ClientHello (TLS 1.3, AEAD, KeyShare DHE)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#cbd5e1;fontColor=#334155;fontSize=10;align=left;spacingLeft=10;" parent="1" vertex="1"/>
+        <mxGeometry x="80" y="170" width="920" height="22" as_="geometry"/>
+        <mxCell id="msg_3" value="3. TLS ServerHello (KeyShare DHE, TLS_AES_256_GCM_SHA384)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#cbd5e1;fontColor=#334155;fontSize=10;align=left;spacingLeft=10;" parent="1" vertex="1"/>
+        <mxGeometry x="80" y="200" width="920" height="22" as_="geometry"/>
+        <mxCell id="msg_4" value="4. EncryptedExtensions, CertificateRequest (Exige X.509 cliente)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#cbd5e1;fontColor=#334155;fontSize=10;align=left;spacingLeft=10;" parent="1" vertex="1"/>
+        <mxGeometry x="80" y="230" width="920" height="22" as_="geometry"/>
+        <mxCell id="msg_5" value="5. Server Certificate, CertificateVerify, Finished" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#cbd5e1;fontColor=#334155;fontSize=10;align=left;spacingLeft=10;" parent="1" vertex="1"/>
+        <mxGeometry x="80" y="260" width="920" height="22" as_="geometry"/>
+        <mxCell id="msg_6" value="6. Client Certificate X.509 v3, CertificateVerify, Finished" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#cbd5e1;fontColor=#334155;fontSize=10;align=left;spacingLeft=10;" parent="1" vertex="1"/>
+        <mxGeometry x="80" y="290" width="920" height="22" as_="geometry"/>
+        <mxCell id="msg_7" value="7. Validación cruzada de certificados contra U-Secure Root CA" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#cbd5e1;fontColor=#334155;fontSize=10;align=left;spacingLeft=10;" parent="1" vertex="1"/>
+        <mxGeometry x="80" y="320" width="920" height="22" as_="geometry"/>
+        <mxCell id="ph_8" value="&amp;lt;b&amp;gt;FASE 2: AUTENTICACIÓN CAPA DE APLICACIÓN (DOBLE FACTOR RF2)&amp;lt;/b&amp;gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f0fdf4;strokeColor=#22c55e;fontColor=#1e293b;fontSize=11;align=center;" parent="1" vertex="1"/>
+        <mxGeometry x="60" y="360" width="960" height="25" as_="geometry"/>
+        <mxCell id="msg_9" value="8. JSON LOGIN (username, password)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#cbd5e1;fontColor=#334155;fontSize=10;align=left;spacingLeft=10;" parent="1" vertex="1"/>
+        <mxGeometry x="80" y="390" width="920" height="22" as_="geometry"/>
+        <mxCell id="msg_10" value="9. Verificación Rate Limiting + Device Binding (CN==user) + PBKDF2 (600k iter)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#cbd5e1;fontColor=#334155;fontSize=10;align=left;spacingLeft=10;" parent="1" vertex="1"/>
+        <mxGeometry x="80" y="420" width="920" height="22" as_="geometry"/>
+        <mxCell id="msg_11" value="10. Asignación IP Virtual (10.8.0.x) + SessionID CSPRNG (128 bits)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#cbd5e1;fontColor=#334155;fontSize=10;align=left;spacingLeft=10;" parent="1" vertex="1"/>
+        <mxGeometry x="80" y="450" width="920" height="22" as_="geometry"/>
+        <mxCell id="ph_12" value="&amp;lt;b&amp;gt;FASE 3: ACCESO A RECURSOS Y SERVICIOS CORPORATIVOS (RBAC)&amp;lt;/b&amp;gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fef3c7;strokeColor=#f59e0b;fontColor=#1e293b;fontSize=11;align=center;" parent="1" vertex="1"/>
+        <mxGeometry x="60" y="490" width="960" height="25" as_="geometry"/>
+        <mxCell id="msg_13" value="11. ACCESS_SERVICE (CORREO_CORPORATIVO / CAMPUS / GESTION)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#cbd5e1;fontColor=#334155;fontSize=10;align=left;spacingLeft=10;" parent="1" vertex="1"/>
+        <mxGeometry x="80" y="520" width="920" height="22" as_="geometry"/>
+        <mxCell id="msg_14" value="12. Validación RBAC y entrega de respuesta segura cifrada" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#cbd5e1;fontColor=#334155;fontSize=10;align=left;spacingLeft=10;" parent="1" vertex="1"/>
+        <mxGeometry x="80" y="550" width="920" height="22" as_="geometry"/>
+        <mxCell id="ph_15" value="&amp;lt;b&amp;gt;FASE 4: DESMONTAJE SEGURO DEL TÚNEL VPN (RF4 - PFS)&amp;lt;/b&amp;gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fee2e2;strokeColor=#ef4444;fontColor=#1e293b;fontSize=11;align=center;" parent="1" vertex="1"/>
+        <mxGeometry x="60" y="590" width="960" height="25" as_="geometry"/>
+        <mxCell id="msg_16" value="13. JSON DISCONNECT" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#cbd5e1;fontColor=#334155;fontSize=10;align=left;spacingLeft=10;" parent="1" vertex="1"/>
+        <mxGeometry x="80" y="620" width="920" height="22" as_="geometry"/>
+        <mxCell id="msg_17" value="14. Liberación de IP Virtual, revocación en BD y destrucción de claves efímeras" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#cbd5e1;fontColor=#334155;fontSize=10;align=left;spacingLeft=10;" parent="1" vertex="1"/>
+        <mxGeometry x="80" y="650" width="920" height="22" as_="geometry"/>
+        <mxCell id="msg_18" value="15. Cierre limpio de sockets TLS" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#cbd5e1;fontColor=#334155;fontSize=10;align=left;spacingLeft=10;" parent="1" vertex="1"/>
+        <mxGeometry x="80" y="680" width="920" height="22" as_="geometry"/>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

@@ -57,6 +57,9 @@ def convert_markdown_to_pdf():
 
     body_html = markdown.markdown(text, extensions=["tables", "fenced_code", "extra", "sane_lists"])
 
+    # Fix image paths to be absolute file:// URLs for Brave rendering
+    body_html = body_html.replace('src="PAI2-ST3/', f'src="file://{BASE_DIR}/PAI2-ST3/')
+
     html_content = f"""<!DOCTYPE html>
 <html lang="es">
 <head>
@@ -165,6 +168,15 @@ def convert_markdown_to_pdf():
     padding: 0;
     color: #1e293b;
     font-size: 7.8pt;
+  }}
+  img {{
+    display: block;
+    max-width: 92%;
+    height: auto;
+    margin: 8px auto;
+    border: 1px solid #e2e8f0;
+    border-radius: 4px;
+    page-break-inside: avoid;
   }}
   .callout {{
     padding: 7px 10px;
