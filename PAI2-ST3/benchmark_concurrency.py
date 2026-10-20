@@ -35,6 +35,15 @@ import statistics
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import Dict, Any, List, Tuple
 
+# Optimización del sistema operativo: Elevamos el límite de descriptores de fichero para concurrencia masiva (RS3)
+try:
+    import resource
+    soft_limit, hard_limit = resource.getrlimit(resource.RLIMIT_NOFILE)
+    if soft_limit < 65536:
+        resource.setrlimit(resource.RLIMIT_NOFILE, (min(65536, hard_limit), hard_limit))
+except Exception:
+    pass
+
 # Rutas de certificados
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 CERTS_DIR = os.path.join(BASE_DIR, "certs")
@@ -153,7 +162,8 @@ def benchmark_single_tls13_client(user_id: int, client_ctx: ssl.SSLContext) -> D
     """
     t_start = time.perf_counter()
     try:
-        raw_sock = socket.create_connection((SERVER_HOST, VPN_TLS_PORT), timeout=15.0)
+        # Abrimos socket TCP con timeout holgado de 35s para absorción del pico simultáneo de 300 handshakes mTLS
+        raw_sock = socket.create_connection((SERVER_HOST, VPN_TLS_PORT), timeout=35.0)
         t_tcp = time.perf_counter()
 
         # Handshake TLS 1.3 con mTLS
@@ -240,6 +250,19 @@ def run_comparative_benchmark(concurrency: int = TOTAL_CONCURRENT_USERS) -> Dict
 
     # 3. Prueba de Carga Masiva: Túnel Seguro VPN TLS 1.3 con mTLS
     print(f"\n[*] [FASE 2/2] Evaluando Pasarela VPN TLS 1.3 (mTLS) con {concurrency} hilos...")
+
+    # Verificamos si la pasarela VPN está escuchando; si no, la iniciamos automáticamente
+    server_instance = None
+    try:
+        probe = socket.create_connection((SERVER_HOST, VPN_TLS_PORT), timeout=0.5)
+        probe.close()
+    except Exception:
+        from vpn_server import VpnServer
+        print(f"[*] Iniciando pasarela VPN Road Warrior TLS 1.3 en segundo plano ({SERVER_HOST}:{VPN_TLS_PORT})...")
+        server_instance = VpnServer(SERVER_HOST, VPN_TLS_PORT)
+        threading.Thread(target=server_instance.start, daemon=True).start()
+        time.sleep(1.0)
+
     tls_results = []
     t0_tls = time.time()
     with ThreadPoolExecutor(max_workers=concurrency) as executor:
@@ -247,6 +270,9 @@ def run_comparative_benchmark(concurrency: int = TOTAL_CONCURRENT_USERS) -> Dict
         for f in as_completed(futures):
             tls_results.append(f.result())
     total_time_tls = time.time() - t0_tls
+
+    if server_instance:
+        server_instance.stop()
 
     # 4. Procesamiento Estadístico de Resultados
     plain_successful = [r for r in plain_results if r["success"]]

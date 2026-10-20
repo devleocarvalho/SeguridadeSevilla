@@ -33,6 +33,15 @@ import time
 import threading
 from typing import Optional, Dict, Any, List
 
+# Optimización del sistema operativo: Elevamos el límite de descriptores de archivo (RS3)
+try:
+    import resource
+    _soft, _hard = resource.getrlimit(resource.RLIMIT_NOFILE)
+    if _soft < 65536:
+        resource.setrlimit(resource.RLIMIT_NOFILE, (min(65536, _hard), _hard))
+except Exception:
+    pass
+
 # Bloqueo reentrante para sincronización de escrituras concurrentes en SQLite (RS3)
 _db_lock = threading.RLock()
 
@@ -196,6 +205,20 @@ def init_database() -> None:
     );
     """)
 
+    # Tabla de Mensajes del Sistema de Correo Electrónico Institucional Webmail (U-Secure)
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS emails (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        sender TEXT NOT NULL,
+        recipient TEXT NOT NULL,
+        subject TEXT NOT NULL,
+        body TEXT NOT NULL,
+        timestamp REAL NOT NULL,
+        is_read INTEGER DEFAULT 0,
+        FOREIGN KEY (recipient) REFERENCES users (username) ON DELETE CASCADE
+    );
+    """)
+
     conn.commit()
     conn.close()
 
@@ -248,6 +271,30 @@ def seed_default_users() -> None:
             "full_name": "Equipo Auditor Security Team 3 (Pruebas de Ciberseguridad)",
             "email": "eval.user@usecure.edu.es",
             "cert_cn": "eval_user"
+        },
+        {
+            "username": "rectorado",
+            "password": "RectoradoSecure2026!#ADM",
+            "role": "PTGAS",
+            "full_name": "Gabinete del Rectorado de U-Secure",
+            "email": "rectorado@usecure.edu.es",
+            "cert_cn": "rectorado"
+        },
+        {
+            "username": "vicerrectorado_inv",
+            "password": "VicerrectoradoID2026!#PDI",
+            "role": "PDI",
+            "full_name": "Vicerrectorado de Investigación y Transferencia",
+            "email": "vicerrectorado_inv@usecure.edu.es",
+            "cert_cn": "vicerrectorado_inv"
+        },
+        {
+            "username": "ciso",
+            "password": "CISOSecureMaster2026!#SEC",
+            "role": "Auditor",
+            "full_name": "Oficina del Chief Information Security Officer (CISO)",
+            "email": "ciso@usecure.edu.es",
+            "cert_cn": "ciso"
         }
     ]
 
@@ -260,6 +307,49 @@ def seed_default_users() -> None:
                 INSERT INTO users (username, salt, password_hash, role, full_name, email, cert_cn, failed_attempts, locked_until, created_at)
                 VALUES (?, ?, ?, ?, ?, ?, ?, 0, 0, ?)
             """, (acc["username"], salt_hex, hash_hex, acc["role"], acc["full_name"], acc["email"], acc["cert_cn"], now))
+
+    # Precarga de mensajes de correo corporativo institucional de bienvenida y avisos
+    initial_emails = [
+        {
+            "sender": "rectorado",
+            "recipient": "carmen_pdi",
+            "subject": "Apertura del Curso Académico 2026/2027",
+            "body": "Estimada Dra. Carmen Sánchez:\n\nLe damos la bienvenida al nuevo curso académico en la Universidad Pública U-Secure. Le recordamos que el acceso a recursos internos desde dispositivos personales BYOD debe realizarse estrictamente mediante la pasarela VPN Road Warrior con TLS 1.3 y autenticación mutua (mTLS).\n\nAtentamente,\nGabinete del Rectorado."
+        },
+        {
+            "sender": "vicerrectorado_inv",
+            "recipient": "carmen_pdi",
+            "subject": "Resolución Convocatoria Proyectos I+D Ciberseguridad",
+            "body": "Estimada Carmen:\n\nSu propuesta de investigación 'Aseguramiento de Redes Académicas frente a Amenazas Cuánticas y Ataques MitM' ha obtenido la máxima calificación en la convocatoria institucional.\n\nEnhorabuena,\nVicerrectorado de Investigación."
+        },
+        {
+            "sender": "ciso",
+            "recipient": "manuel_ptgas",
+            "subject": "Directiva de Auditoría: Pasarelas VPN y Concurrencia 300 Sesiones",
+            "body": "Estimado Manuel:\n\nProceda a supervisar la capacidad del pool virtual 10.8.0.0/22 para garantizar el soporte holgado de hasta 300 sesiones simultáneas concurrentes sin pérdidas de conectividad según el requisito RS3.\n\nSaludos cordiales,\nÁrea de Seguridad y CISO U-Secure."
+        },
+        {
+            "sender": "carmen_pdi",
+            "recipient": "lucia_inv",
+            "subject": "Acceso al Clúster HPC y Datasets de Criptoanálisis",
+            "body": "Hola Lucía:\n\nHe autorizado tus permisos para el clúster HPC a través de la VPN. Por favor, revisa las simulaciones de Hashcat para verificar el coste computacional de PBKDF2 frente a fuerza bruta.\n\nUn saludo,\nCarmen."
+        },
+        {
+            "sender": "ciso",
+            "recipient": "eval_user",
+            "subject": "Credenciales de Auditoría y Verificación - Security Team 3",
+            "body": "Estimados Auditores del Security Team 3:\n\nSu cuenta 'eval_user' dispone de privilegios de auditoría para verificar los requisitos funcionales y de seguridad de la infraestructura BYODSEC de la Universidad U-Secure.\n\nÁrea de Seguridad de la Información."
+        }
+    ]
+
+    # Insertamos los correos iniciales si no existen aún en la tabla emails
+    for em in initial_emails:
+        cursor.execute("SELECT id FROM emails WHERE recipient = ? AND subject = ?", (em["recipient"], em["subject"]))
+        if cursor.fetchone() is None:
+            cursor.execute("""
+                INSERT INTO emails (sender, recipient, subject, body, timestamp, is_read)
+                VALUES (?, ?, ?, ?, ?, 0)
+            """, (em["sender"], em["recipient"], em["subject"], em["body"], now - 3600.0))
 
     conn.commit()
     conn.close()
@@ -465,6 +555,160 @@ def destroy_vpn_session(session_id: str) -> bool:
     log_audit_event("SESSION_TERMINATE", "INFO", username, client_ip,
                     f"Túnel VPN desmontado explícitamente (RF4). IP Virtual liberada: {virtual_ip}")
     return True
+
+
+# ======================================================================================
+# GESTIÓN DEL SERVICIO DE CORREO ELECTRÓNICO INSTITUCIONAL (WEBMAIL)
+# ======================================================================================
+
+def send_email(sender: str, recipient: str, subject: str, body: str) -> tuple:
+    """
+    Qué hace:
+        Inserta un nuevo mensaje de correo electrónico en la tabla emails vinculándolo al remitente y destinatario.
+    Cuál es su función:
+        Permitir a los usuarios de la comunidad universitaria intercambiar mensajes protegidos dentro del perímetro VPN.
+    Cómo lo hace:
+        1. Limpia los campos de entrada y resuelve si el destinatario se especificó como correo o nombre de usuario.
+        2. Verifica que el remitente y destinatario existan en el directorio institucional (tabla users) o pertenezcan al dominio institucional.
+        3. Inserta el registro en la base de datos con marca de tiempo UTC e is_read=0.
+        4. Registra un evento de auditoría EMAIL_SENT en audit_logs de forma trazable.
+    """
+    # Adquirimos el bloqueo reentrante de base de datos para garantizar consistencia transaccional
+    with _db_lock:
+        # Abrimos la conexión con la base de datos SQLite institucional
+        conn = get_db_connection()
+        # Obtenemos el cursor para ejecutar las consultas SQL
+        cursor = conn.cursor()
+
+        # Normalizamos el identificador del destinatario eliminando espacios sobrantes
+        recipient_clean = recipient.strip()
+        # Si se introdujo en formato correo (ej: manuel.ptgas@usecure.edu.es), resolvemos su nombre de usuario en users
+        cursor.execute("SELECT username FROM users WHERE email = ? OR username = ?", (recipient_clean, recipient_clean))
+        dest_row = cursor.fetchone()
+
+        # Si el usuario no existe en la base de datos local, comprobamos si es un alias válido de sistema
+        if dest_row is None:
+            # Si el destinatario no está registrado, cerramos la conexión y devolvemos error
+            conn.close()
+            return False, f"El destinatario '{recipient}' no existe en el directorio de U-Secure.", None
+
+        # Obtenemos el nombre canónico de usuario del destinatario
+        canonical_recipient = dest_row["username"]
+        # Capturamos la marca de tiempo actual en formato UNIX Epoch UTC
+        now = time.time()
+
+        # Insertamos el mensaje en la tabla emails
+        cursor.execute("""
+            INSERT INTO emails (sender, recipient, subject, body, timestamp, is_read)
+            VALUES (?, ?, ?, ?, ?, 0)
+        """, (sender, canonical_recipient, subject.strip(), body.strip(), now))
+
+        # Obtenemos el identificador autonumérico generado para el nuevo correo
+        email_id = cursor.lastrowid
+        # Confirmamos la transacción en disco
+        conn.commit()
+        # Cerramos la conexión con SQLite
+        conn.close()
+
+    # Registramos el evento en el log de auditoría corporativo
+    log_audit_event("EMAIL_SENT", "INFO", sender, "VPN_TUNNEL",
+                    f"Correo enviado con ID {email_id} a '{canonical_recipient}'. Asunto: '{subject}'")
+
+    # Retornamos éxito, mensaje explicativo y el ID del correo generado
+    return True, f"Mensaje enviado con éxito a {canonical_recipient}", email_id
+
+
+def get_user_emails(username: str, unread_only: bool = False) -> List[Dict[str, Any]]:
+    """
+    Qué hace:
+        Recupera la lista de correos electrónicos dirigidos a un usuario institucional específico.
+    Cuál es su función:
+        Suministrar la bandeja de entrada al cliente webmail en el entorno seguro de la intranet VPN.
+    Cómo lo hace:
+        Ejecuta una consulta SQL SELECT sobre la tabla emails filtrando por destinatario y ordenando cronológicamente de forma descendente.
+    """
+    # Abrimos la conexión segura con la base de datos
+    conn = get_db_connection()
+    # Obtenemos el cursor relacional
+    cursor = conn.cursor()
+
+    # Filtramos por no leídos si se especifica en los argumentos
+    if unread_only:
+        # Consulta para mensajes pendientes de lectura
+        cursor.execute("""
+            SELECT id, sender, recipient, subject, body, timestamp, is_read
+            FROM emails
+            WHERE recipient = ? AND is_read = 0
+            ORDER BY timestamp DESC
+        """, (username,))
+    else:
+        # Consulta para todos los mensajes de la bandeja de entrada
+        cursor.execute("""
+            SELECT id, sender, recipient, subject, body, timestamp, is_read
+            FROM emails
+            WHERE recipient = ?
+            ORDER BY timestamp DESC
+        """, (username,))
+
+    # Extraemos todas las filas coincidentes
+    rows = cursor.fetchall()
+    # Convertimos cada fila en un diccionario Python estándar
+    emails_list = [dict(r) for r in rows]
+    # Cerramos la conexión de lectura
+    conn.close()
+
+    # Retornamos la lista de correos procesados
+    return emails_list
+
+
+def get_email_by_id(email_id: int, username: str) -> Optional[Dict[str, Any]]:
+    """
+    Qué hace:
+        Recupera el contenido completo de un mensaje de correo por su ID y lo marca como leído.
+    Cuál es su función:
+        Permitir la visualización del cuerpo del mensaje y actualizar su estado a leído (is_read = 1).
+    Cómo lo hace:
+        Consulta la tabla emails verificando que el usuario sea el destinatario o el remitente,
+        actualiza el campo is_read a 1 y registra un evento de auditoría de lectura.
+    """
+    # Adquirimos el bloqueo reentrante para asegurar la actualización atómica del estado
+    with _db_lock:
+        # Abrimos la conexión con la base de datos
+        conn = get_db_connection()
+        # Obtenemos el cursor relacional
+        cursor = conn.cursor()
+
+        # Consultamos el mensaje por su identificador primario
+        cursor.execute("SELECT * FROM emails WHERE id = ?", (email_id,))
+        # Extraemos la fila del correo
+        row = cursor.fetchone()
+
+        # Si el correo no existe, cerramos la conexión y retornamos None
+        if row is None:
+            conn.close()
+            return None
+
+        # Convertimos la fila a un diccionario Python
+        email_data = dict(row)
+
+        # Verificamos si el usuario actual es el destinatario para marcarlo como leído
+        if email_data["recipient"] == username and email_data["is_read"] == 0:
+            # Actualizamos la columna is_read a 1
+            cursor.execute("UPDATE emails SET is_read = 1 WHERE id = ?", (email_id,))
+            # Marcamos en el diccionario devuelto el nuevo estado
+            email_data["is_read"] = 1
+            # Confirmamos los cambios en la base de datos
+            conn.commit()
+
+        # Cerramos la conexión
+        conn.close()
+
+    # Registramos evento de auditoría de lectura
+    log_audit_event("EMAIL_READ", "INFO", username, "VPN_TUNNEL",
+                    f"Lectura de correo ID {email_id}. Remitente: '{email_data['sender']}'. Asunto: '{email_data['subject']}'")
+
+    # Retornamos los datos completos del correo electrónico
+    return email_data
 
 
 def log_audit_event(event_type: str, severity: str, username: Optional[str], client_ip: Optional[str], details: str) -> None:

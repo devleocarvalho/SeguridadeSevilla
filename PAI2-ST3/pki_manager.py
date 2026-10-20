@@ -412,6 +412,72 @@ def issue_client_certificate(
     return client_key, client_cert, client_key_path, client_cert_path
 
 
+def load_root_ca() -> tuple:
+    """
+    Qué hace:
+        Carga la clave privada y el certificado digital de la Autoridad de Certificación Raíz (Root CA) desde disco.
+    Cuál es su función:
+        Permitir la emisión dinámica y bajo demanda de certificados de cliente BYOD para nuevos usuarios registrados.
+    Cómo lo hace:
+        1. Comprueba si existen los archivos ca.key y ca.crt en el directorio de certificados.
+        2. Si no existen, invoca create_root_ca() para aprovisionar la entidad emisora.
+        3. Si existen, lee los bytes PEM y los deserializa mediante load_pem_private_key y load_pem_x509_certificate.
+    """
+    # Determinamos las rutas absolutas de los ficheros de la CA Raíz
+    ca_key_path = os.path.join(CERTS_DIR, "ca.key")
+    ca_cert_path = os.path.join(CERTS_DIR, "ca.crt")
+
+    # Si falta alguno de los ficheros, generamos la CA Raíz desde cero
+    if not os.path.exists(ca_key_path) or not os.path.exists(ca_cert_path):
+        ca_key, ca_cert, _, _ = create_root_ca()
+        return ca_key, ca_cert
+
+    # Leemos la clave privada de la CA desde disco
+    with open(ca_key_path, "rb") as f:
+        ca_key_bytes = f.read()
+    ca_key = serialization.load_pem_private_key(ca_key_bytes, password=None)
+
+    # Leemos el certificado X.509 de la CA desde disco
+    with open(ca_cert_path, "rb") as f:
+        ca_cert_bytes = f.read()
+    ca_cert = x509.load_pem_x509_certificate(ca_cert_bytes)
+
+    # Retornamos los objetos criptográficos en memoria
+    return ca_key, ca_cert
+
+
+def issue_client_certificate_for_user(username: str, role: str = "PDI", email: str = None) -> tuple:
+    """
+    Qué hace:
+        Automatiza la solicitud, generación y firma de un certificado digital de cliente BYOD para un usuario específico.
+    Cuál es su función:
+        Vincular el alta de un nuevo usuario en el cliente con la obtención de sus credenciales criptográficas mTLS.
+    Cómo lo hace:
+        1. Carga la Autoridad de Certificación Raíz mediante load_root_ca().
+        2. Si no se indica email, construye la dirección por defecto '{username}@usecure.edu.es'.
+        3. Ejecuta issue_client_certificate generando la clave RSA de 2048 bits y el certificado X.509 v3.
+        4. Retorna las rutas del certificado y de la clave privada generados.
+    """
+    # Cargamos el ancla de confianza de la universidad (Root CA)
+    ca_key, ca_cert = load_root_ca()
+
+    # Asignamos dirección de correo electrónico institucional por defecto si no se proporcionó
+    if not email:
+        email = f"{username}@usecure.edu.es"
+
+    # Emitimos y firmamos el certificado del nuevo cliente BYOD
+    _, _, key_path, cert_path = issue_client_certificate(
+        ca_key=ca_key,
+        ca_cert=ca_cert,
+        username=username,
+        role=role,
+        email=email
+    )
+
+    # Retornamos las rutas físicas en disco
+    return cert_path, key_path
+
+
 def create_rogue_attacker_pki() -> tuple:
     """
     Qué hace:

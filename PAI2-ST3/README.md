@@ -28,6 +28,7 @@ PAI2-ST3/
 ├── test_rogue_server.py     # PoC Ataque 3: Detección y rechazo de gateway falso / Evil Twin (+10% Extra)
 ├── hashcat_audit.py         # Auditoría criptográfica con Hashcat (Modos 10900/1450) y justificación de mTLS
 ├── benchmark_concurrency.py # Estudio experimental comparativo de 300 sesiones concurrentes (RS3)
+├── test_300_sessions.py     # Script de verificación y certificación de 300 sesiones simultáneas en red (RS3)
 ├── run_all_tests.py         # Suite integral de validación automatizada (12 tests, 100% cobertura)
 ├── certs/                   # Almacén de certificados X.509 v3 y claves privadas RSA
 │   ├── ca.crt / ca.key
@@ -85,7 +86,12 @@ python3 run_all_tests.py
 python3 benchmark_concurrency.py
 ```
 
-### 7. Ejecutar la Auditoría Criptográfica con Hashcat:
+### 7. Ejecutar la Verificación de 300 Sesiones Simultáneas en Red (RS3):
+```bash
+python3 test_300_sessions.py
+```
+
+### 8. Ejecutar la Auditoría Criptográfica con Hashcat:
 ```bash
 python3 hashcat_audit.py
 ```

@@ -38,13 +38,25 @@ import logging
 from concurrent.futures import ThreadPoolExecutor
 from typing import Tuple, Dict, Any, Optional
 
+# Optimización del sistema operativo para soporte holgado de más de 300 sesiones simultáneas (RS3)
+try:
+    import resource
+    _soft, _hard = resource.getrlimit(resource.RLIMIT_NOFILE)
+    if _soft < 65536:
+        resource.setrlimit(resource.RLIMIT_NOFILE, (min(65536, _hard), _hard))
+except Exception:
+    pass
+
 # Importamos el módulo de base de datos local para validación y persistencia
 from database import (
     authenticate_user,
     create_vpn_session,
     destroy_vpn_session,
     log_audit_event,
-    get_db_connection
+    get_db_connection,
+    send_email,
+    get_user_emails,
+    get_email_by_id
 )
 
 # Definición de rutas base de certificados y configuración del servidor
@@ -298,6 +310,90 @@ def handle_client_connection(raw_client_sock: socket.socket, client_addr: Tuple[
                     logger.info(f"[+] Acceso autorizado a '{service_key}' para usuario '{session_info['username']}' ({user_role})")
                     log_audit_event("RESOURCE_ACCESS", "INFO", session_info["username"], client_ip,
                                     f"Acceso concedido al servicio {service_key}")
+
+                    # Tratamiento específico interactivo para el servicio de CORREO_CORPORATIVO (Webmail)
+                    if service_key == "CORREO_CORPORATIVO":
+                        # Obtenemos la subacción solicitada si existe (LIST, READ, SEND)
+                        email_action = request.get("email_action", "").upper()
+
+                        if email_action == "LIST":
+                            # Listar correos de la bandeja de entrada del usuario autenticado
+                            unread_only = bool(request.get("unread_only", False))
+                            user_emails = get_user_emails(session_info["username"], unread_only=unread_only)
+                            unread_count = sum(1 for e in user_emails if not e["is_read"])
+                            response = {
+                                "status": 200,
+                                "service": service_meta["name"],
+                                "email_action": "LIST",
+                                "emails": user_emails,
+                                "total_count": len(user_emails),
+                                "unread_count": unread_count,
+                                "timestamp": time.time()
+                            }
+                            ssl_sock.sendall(json.dumps(response).encode("utf-8") + b"\n")
+                            continue
+
+                        elif email_action == "READ":
+                            # Lectura de un correo específico por su identificador
+                            email_id = request.get("email_id")
+                            if email_id is None:
+                                response = {"status": 400, "error": "Debe proporcionar el parámetro 'email_id'."}
+                            else:
+                                email_obj = get_email_by_id(int(email_id), session_info["username"])
+                                if not email_obj:
+                                    response = {"status": 404, "error": f"No se encontró el correo ID {email_id} o no tiene permisos."}
+                                else:
+                                    response = {
+                                        "status": 200,
+                                        "service": service_meta["name"],
+                                        "email_action": "READ",
+                                        "email": email_obj,
+                                        "timestamp": time.time()
+                                    }
+                            ssl_sock.sendall(json.dumps(response).encode("utf-8") + b"\n")
+                            continue
+
+                        elif email_action == "SEND":
+                            # Envío y almacenamiento de un nuevo correo electrónico
+                            dest = request.get("recipient", "").strip()
+                            subj = request.get("subject", "").strip()
+                            body = request.get("body", "").strip()
+
+                            if not dest or not subj or not body:
+                                response = {"status": 400, "error": "Los campos 'recipient', 'subject' y 'body' son obligatorios."}
+                            else:
+                                send_ok, send_msg, new_eid = send_email(session_info["username"], dest, subj, body)
+                                if send_ok:
+                                    response = {
+                                        "status": 200,
+                                        "service": service_meta["name"],
+                                        "email_action": "SEND",
+                                        "message": send_msg,
+                                        "email_id": new_eid,
+                                        "timestamp": time.time()
+                                    }
+                                else:
+                                    response = {"status": 400, "error": send_msg}
+                            ssl_sock.sendall(json.dumps(response).encode("utf-8") + b"\n")
+                            continue
+
+                        else:
+                            # Respuesta por defecto para retrocompatibilidad con tests existentes
+                            user_emails = get_user_emails(session_info["username"])
+                            unread_count = sum(1 for e in user_emails if not e["is_read"])
+                            response = {
+                                "status": 200,
+                                "service": service_meta["name"],
+                                "data": f"Buzón corporativo activo: {len(user_emails)} correos en bandeja ({unread_count} sin leer).",
+                                "emails": user_emails,
+                                "unread_count": unread_count,
+                                "total_count": len(user_emails),
+                                "timestamp": time.time()
+                            }
+                            ssl_sock.sendall(json.dumps(response).encode("utf-8") + b"\n")
+                            continue
+
+                    # Respuesta estándar para el resto de servicios corporativos (Campus Virtual, Nóminas, HPC)
                     response = {
                         "status": 200,
                         "service": service_meta["name"],
